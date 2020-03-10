@@ -34,14 +34,12 @@ def do_connect():
     print('network config:', wlan.ifconfig())
 
 # REST APIに要求を送信し、応答をJSON形式で返す。
-def request_and_get_json(
-        kind, url, headers=None, data=None):
+def request_and_get_json(kind, url, headers=None, data=None):
     j = {}
     r = None
     try:
         # 指定されたURLに要求を送信し、応答をrに格納する。
-        r = urequests.request(
-            kind, url, headers=headers, data=data)
+        r = urequests.request(kind, url, headers=headers, data=data)
         # 応答をJSONデータに変換する。
         j = r.json()
     except Exception as e:
@@ -55,17 +53,14 @@ def request_and_get_json(
 # セサミの一覧を取得しリストで返す。
 def get_sesames():
     return request_and_get_json(
-        "GET",
-        API_COMMON + '/sesames',
-        headers=HEADER_GET)
+        "GET", API_COMMON + '/sesames', headers=HEADER_GET)
 
 # セサミの状態を取得する。
 # 返値は'locked', 'unlocked', 'failed'のいずれか。
 def get_sesame_status(sesame):
     j = request_and_get_json(
         "GET",
-        (API_COMMON + '/sesame/{}')
-            .format(sesame['device_id']),
+        (API_COMMON + '/sesame/{}').format(sesame['device_id']),
         headers=HEADER_GET)
     try:
         return 'locked' if j['locked'] else 'unlocked'
@@ -77,22 +72,19 @@ def get_sesame_status(sesame):
 # command引数で'lock'または'unlock'を指定する。
 def do_sesame(sesame, command):
     post_data = ujson.dumps(dict(command=command))
-    print('{} {}ing.'
-          .format(sesame['nickname'], command), end='')
+    print('{} {}ing.'.format(sesame['nickname'], command), end='')
     # コマンドを送信する。
     # 応答結果としてタスクID(task_id)が得られる。
     j = request_and_get_json(
         "POST",
-        (API_COMMON + '/sesame/{}')
-            .format(sesame['device_id']),
+        (API_COMMON + '/sesame/{}').format(sesame['device_id']),
         headers=HEADER_POST,
         data=post_data)
     # タスクが完了状態(terminated)になるまで待つ。
     while True:
         j = request_and_get_json(
             "GET",
-            (API_COMMON + '/action-result?task_id={}')
-                .format(j['task_id']),
+            (API_COMMON + '/action-result?task_id={}').format(j['task_id']),
             headers=HEADER_GET)
         print('.', end='')
         if 'status' in j and j['status'] == 'terminated':
