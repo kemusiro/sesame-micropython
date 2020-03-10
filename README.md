@@ -1,0 +1,2 @@
+# sesame-micropython
+セサミをMicroPythonで操作するサンプルプログラム
